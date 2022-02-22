@@ -6,19 +6,44 @@ one sig Subtraction extends Operation{}
 one sig Division extends Operation{}
 one sig Multiplication extends Operation{}
 
+// We have members instead of raw integers to allow for duplicates
+sig Member{
+    val: one Int // value
+}
 
 //coordinates to the board mapping to the number at that position
 one sig Board { 
-    position: func Int -> Int -> Int 
+    position: func Int -> Int -> Member 
     cage: func Int -> Int -> Cage 
 }
+
+/*
+Every member is part of a cage
+
+all row,col : Int | {
+    some c : Cage | {
+        (Board.cage[row][col] = c) implies {
+
+        }
+    }
+    
+}
+*/
 
 //each Cage maps to a solution, a number that can be calculated using 
 //the operator and the members of the cage 
 sig Cage {
     operator: Operation
     solution: Int 
-    //have to find some way for a Cage to know about its members
+    // Have a set of members associated with a cage
+
+
+}
+
+pred boardInitial {
+    /*
+    It is a square 3x3 board (hardcoding a 3x3 kenken)
+    */
 }
 
 //uniqueRows and uniqueCols predicates constrains that 
@@ -26,19 +51,36 @@ sig Cage {
 pred uniqueRows[b: Board] {
     //all rows in a 3x3 KenKen board must add up to 6 
     all row: Int | {
-        add[b.position[row][0], b.position[row][1], b.position[row][2]] = 6
+        add[b.position[row][0].val, b.position[row][1].val, b.position[row][2].val] = 6
     }
 }
 
 pred uniqueCols {
     //all rows in a 3x3 KenKen board must add up to 6 
     all col: Int | {
-        add[b.position[0][col], b.position[1][col], b.position[2][col]] = 6
+        add[b.position[0][col].val, b.position[1][col].val, b.position[2][col].val] = 6
     }
 }
 
-pred cagesSatisfiable {
 
+pred cagesInitial {
+    // Every cage should map to a valid place on the board
+
+    // Cages do not map to places not on the board
+
+    // Cages do not overlap
+}
+
+pred cagesSatisfiable {
+/*
+all c: Cage:
+    c.operator = Addition implies
+        ...all elements in cage add[] = c.solution
+    c.operator = Subtraction implies
+        ... all elements in cage subtract[] = c.solution
+    c.operator = ...
+        ...
+*/
 }
 
 //constrains the valid number range (1,2,3) for a 3x3 KenKen Board
