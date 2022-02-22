@@ -12,6 +12,9 @@ How to add up all members' values given a cage (for cagesSatisfiable)
 Is our operation architecture good or is it convoluted?
 
 Check constraints for other types of cage-operations
+
+How to set global fields, BOARD_ROW_NUM global variable, etc...
+    MAX_BOUNDS, etc...
 */
 
 
