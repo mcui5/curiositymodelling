@@ -1,4 +1,4 @@
-#lang forge/bsl “cm” “sdy0a6hzorfkosis”
+#lang forge/bsl "cm" "sdy0a6hzorfkosis"
 
 /*
 TODO LIST:
@@ -13,7 +13,7 @@ Is our operation architecture good or is it convoluted?
 
 Check constraints for other types of cage-operations
 
-How to set global fields, BOARD_ROW_NUM global variable, etc...
+EDPOST: How to set global fields, BOARD_ROW_NUM global variable, etc...
     MAX_BOUNDS, etc...
 */
 
@@ -27,13 +27,27 @@ one sig Multiplication extends Operation{}
 // We have members instead of raw integers to allow for duplicates
 sig Member{
     val: one Int // value
+    // c : one Cage
 }
 
 //coordinates to the board mapping to the number at that position
-one sig Board { 
-    position: func Int -> Int -> Member 
-    cage: func Int -> Int -> Cage 
+one sig Board {  
+    position: func Int -> Int -> Member,
+    cage: func Int -> Int -> Cage
 }
+
+//each Cage maps to a solution, a number that can be calculated using 
+//the operator and the members of the cage 
+sig Cage {
+    operator: one Operation,
+    solution: one Int,
+    // Have a set of members associated with a cage
+    members: set Cage -> Member
+}
+
+run {
+
+} for exactly 9 Member, 1 Cage, 1 Board 
 
 /*
 Every member is part of a cage
@@ -48,14 +62,6 @@ all row,col : Int | {
 }
 */
 
-//each Cage maps to a solution, a number that can be calculated using 
-//the operator and the members of the cage 
-sig Cage {
-    operator: one Operation
-    solution: one Int 
-    // Have a set of members associated with a cage
-
-}
 
 // Each member is on the board on exactly one position
 pred Singleton {
@@ -71,6 +77,10 @@ pred Singleton {
     }
     // Member positions should not overlap because if i,j are mapped to a specific member, they can't be mapped to anything else
     // This preidcate was adopted from the n-queens lab
+
+    // Check cage doesn't overlap
+    // Check members unique between cages
+    
 }
 
 pred boardInitial { // TODO: maybe remove this?
@@ -84,14 +94,14 @@ pred boardInitial { // TODO: maybe remove this?
 pred uniqueRows[b: Board] {
     //all rows in a 3x3 KenKen board must add up to 6 
     all row: Int | {
-        add[b.position[row][0].val, b.position[row][1].val, b.position[row][2].val] = 6
+        // add[b.position[row][0].val, b.position[row][1].val, b.position[row][2].val] = 6
     }
 }
 
 pred uniqueCols {
     //all rows in a 3x3 KenKen board must add up to 6 
     all col: Int | {
-        add[b.position[0][col].val, b.position[1][col].val, b.position[2][col].val] = 6
+        // add[b.position[0][col].val, b.position[1][col].val, b.position[2][col].val] = 6
     }
 }
 
@@ -105,6 +115,8 @@ pred cagesInitial {
 
     // Subtraction cages should have a maximum of two members
     // (TODO: Check constraints for other types of cage-operations)
+
+    // Cages must be connected veritcally/horizontally
 }
 
 pred cagesSatisfiable {
@@ -121,9 +133,12 @@ all c: Cage:
 */
 
 /*
-    all m : Member, c: Cage | m.cage = c implies {
-
+    all c: Cage | {
+        sum[c.members.val]
     }
 */
-
 }
+
+// run {
+
+// } for exactly 3 Member
