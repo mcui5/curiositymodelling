@@ -106,6 +106,8 @@ all c: Cage:
         ...all elements in cage add[] = c.solution
     c.operator = Subtraction implies
         ... all elements in cage subtract[] = c.solution
+        // NOTE: For division and subtraction, check all permutations of calculation
+        // There has to be SOME ordering that produces solution
     c.operator = ...
         ...
 */
@@ -117,6 +119,3 @@ all c: Cage:
 */
 
 }
-
-
-
