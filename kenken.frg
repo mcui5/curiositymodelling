@@ -10,6 +10,8 @@ How to add up all members' values given a cage (for cagesSatisfiable)
     to add up all members associated with a cage?
 
 Is our operation architecture good or is it convoluted?
+
+Check constraints for other types of cage-operations
 */
 
 
@@ -97,6 +99,9 @@ pred cagesInitial {
     // Cages do not map to places not on the board
 
     // Cages do not overlap
+
+    // Subtraction cages should have a maximum of two members
+    // (TODO: Check constraints for other types of cage-operations)
 }
 
 pred cagesSatisfiable {
