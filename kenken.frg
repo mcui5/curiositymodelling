@@ -1,5 +1,18 @@
 #lang forge/bsl “cm” “sdy0a6hzorfkosis”
 
+/*
+TODO LIST:
+
+How to add up all members' values given a cage (for cagesSatisfiable)
+    (use sum[...] ? - Have a "set" of members in Cage sig?)
+    OR, 
+    Is there a way if we add a cage field to the member class,
+    to add up all members associated with a cage?
+
+Is our operation architecture good or is it convoluted?
+*/
+
+
 abstract sig Operation {}
 one sig Addition extends Operation{} 
 one sig Subtraction extends Operation{}
@@ -33,14 +46,29 @@ all row,col : Int | {
 //each Cage maps to a solution, a number that can be calculated using 
 //the operator and the members of the cage 
 sig Cage {
-    operator: Operation
-    solution: Int 
+    operator: one Operation
+    solution: one Int 
     // Have a set of members associated with a cage
-
 
 }
 
-pred boardInitial {
+// Each member is on the board on exactly one position
+pred Singleton {
+    all m : Member | {
+      // Each member is on the board on exactly one square
+      one i, j: Int | { 
+        Board.position[i][j] = m
+        // The board is 3x3 so Int ranges from 1-3
+        // constrains the valid number range (1,2,3) for a 3x3 KenKen Board
+        i >= 1 and i<= 3
+        j >= 1 and j<= 3
+      } 
+    }
+    // Member positions should not overlap because if i,j are mapped to a specific member, they can't be mapped to anything else
+    // This preidcate was adopted from the n-queens lab
+}
+
+pred boardInitial { // TODO: maybe remove this?
     /*
     It is a square 3x3 board (hardcoding a 3x3 kenken)
     */
@@ -81,14 +109,13 @@ all c: Cage:
     c.operator = ...
         ...
 */
-}
 
-//constrains the valid number range (1,2,3) for a 3x3 KenKen Board
-pred validNumbers[b: Board] {
-    all r,c: Int | {
-        1 <= b.position[r][c]
-        b.position[r][c] <= 3
+/*
+    all m : Member, c: Cage | m.cage = c implies {
+
     }
+*/
+
 }
 
 
