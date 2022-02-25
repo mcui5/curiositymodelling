@@ -36,14 +36,19 @@ one sig Board {
     cage: func Int -> Int -> Cage
 }
 
+
+one sig Yes {}
+
 //each Cage maps to a solution, a number that can be calculated using 
 //the operator and the members of the cage 
 sig Cage {
     operator: one Operation,
     solution: one Int,
     // Have a set of members associated with a cage
-    members: set Cage -> Member
+    members: pfunc Member -> Yes
 }
+
+
 
 run {
 
@@ -123,7 +128,9 @@ pred cagesSatisfiable {
 /*
 all c: Cage:
     c.operator = Addition implies
-        ...all elements in cage add[] = c.solution
+        all c: Cage | {
+        (sum m: Member | c.member[m] = Yes implies m.val else 0) = c.solution
+        }
     c.operator = Subtraction implies
         ... all elements in cage subtract[] = c.solution
         // NOTE: For division and subtraction, check all permutations of calculation
@@ -133,9 +140,12 @@ all c: Cage:
 */
 
 /*
-    all c: Cage | {
-        sum[c.members.val]
-    }
+
+Sequence library: Every cage contains a sequence of Members,
+follow seq in constraint & use an aggregator. Member's "soFar" val
+is itself, every other Members' soFar is itself (operation) predecessor
+
+           // sum[c.members.val]
 */
 }
 
