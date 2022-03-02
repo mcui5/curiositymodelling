@@ -17,6 +17,24 @@ EDPOST: How to set global fields, BOARD_ROW_NUM global variable, etc...
     MAX_BOUNDS, etc...
 */
 
+// Board is BOARD_ROW_NUM by BOARD_ROW_NUM. This is ALSO the maximum integer val of each member & max_add_cagesize
+fun BOARD_ROW_NUM: one Int { 3 }
+// The minimum integer value of each member
+fun MIN_MEMBER_VAL: one Int {1}
+// The max integer value of each member
+fun MAX_MEMBER_VAL: one Int {BOARD_ROW_NUM}
+// The maximum number of tiles a single cage can have
+fun MAX_CAGE_SIZE: one Int { 9 } //max size cage rules? 
+
+
+// The minimum number of tiles a single cage can have
+fun MIN_CAGE_SIZE: one Int { 1 } 
+// The maximum size of a non-addition cage
+fun MAX_NONADD_CAGESIZE: one Int { 2 }
+// For the purposes of curiosity modeling, we simplify the problem such that addition cages
+// are the only cages that can be of size >2
+fun MAX_ADD_CAGESIZE: one Int { BOARD_ROW_NUM }
+
 
 abstract sig Operation {}
 one sig Addition extends Operation{} 
@@ -50,9 +68,9 @@ sig Cage {
 
 
 
-run {
+// run {
 
-} for exactly 9 Member, 1 Cage, 1 Board 
+// } for exactly 9 Member, 1 Cage, 1 Board 
 
 /*
 Every member is part of a cage
@@ -73,42 +91,75 @@ pred Singleton {
     all m : Member | {
       // Each member is on the board on exactly one square
       one i, j: Int | { 
+        // The board is BOARD_ROW_NUMxBOARD_ROW_NUM so Int ranges from MIN_MEMBER_VAL to BOARD_ROW_NUM
+        // e.g. constrains the valid number range (1,2,3) for a 3x3 KenKen Board
+        i >= MIN_MEMBER_VAL and i <= MAX_MEMBER_VAL
+        j >= MIN_MEMBER_VAL and j <= MAX_MEMBER_VAL
+
         Board.position[i][j] = m
-        // The board is 3x3 so Int ranges from 1-3
-        // constrains the valid number range (1,2,3) for a 3x3 KenKen Board
-        i >= 1 and i<= 3
-        j >= 1 and j<= 3
+
+        no k,l: Int | {
+            (k != i or l !=j implies Board.position[k][l] = m)
+        }
       } 
+    //   // No members exist outside the board bounds
+    //   no i,j: Int | { // Currently unsat
+    //     ((i < MIN_MEMBER_VAL or i > MAX_MEMBER_VAL or
+    //     j < MIN_MEMBER_VAL or j > MAX_MEMBER_VAL)
+    //     implies
+    //     Board.position[i][j] = m)
+    //   }
     }
     // Member positions should not overlap because if i,j are mapped to a specific member, they can't be mapped to anything else
     // This preidcate was adopted from the n-queens lab
 
     // Check cage doesn't overlap
     // Check members unique between cages
+    // All members belong to a cage
     
 }
 
-pred boardInitial { // TODO: maybe remove this?
-    /*
-    It is a square 3x3 board (hardcoding a 3x3 kenken)
-    */
+pred membersValidValues {
+    all m: Member | {
+        m.val >= MIN_MEMBER_VAL and m.val <= MAX_MEMBER_VAL
+    }
 }
 
 //uniqueRows and uniqueCols predicates constrains that 
 //the rows and columns in a 3x3 board add up to 6 (1+2+3 = 6)
-pred uniqueRows[b: Board] {
+pred uniqueRows {
     //all rows in a 3x3 KenKen board must add up to 6 
     all row: Int | {
         // add[b.position[row][0].val, b.position[row][1].val, b.position[row][2].val] = 6
+        no disj col1,col2: Int | {
+            all m1,m2: Member | Board.position[row][col1] = m1 and Board.position[row][col2] = m2 implies {
+                m1.val = m2.val
+            }
+            // Board.position[row][col1].val = Board.position[row][col2].val
+        }
     }
 }
 
-pred uniqueCols {
-    //all rows in a 3x3 KenKen board must add up to 6 
-    all col: Int | {
-        // add[b.position[0][col].val, b.position[1][col].val, b.position[2][col].val] = 6
-    }
+// pred uniqueCols {
+//     //all rows in a 3x3 KenKen board must add up to 6 
+//     all col: Int | {
+//         // add[b.position[0][col].val, b.position[1][col].val, b.position[2][col].val] = 6
+//         no disj row1,row2: Int | {
+//             Board.position[row1][col].val = Board.position[row2][col].val
+//         }
+//     }
+// }
+
+pred wellformed {
+    // Rows unique member values
+// uniqueRows
+    // Columns unique member values
+// uniqueCols
+    // Members have properly constrained values
+    membersValidValues
 }
+
+
 
 
 pred cagesInitial {
@@ -143,12 +194,16 @@ all c: Cage:
 
 Sequence library: Every cage contains a sequence of Members,
 follow seq in constraint & use an aggregator. Member's "soFar" val
-is itself, every other Members' soFar is itself (operation) predecessor
+is itself, every other Members' soFar is itself (operation) predecesso`r
+
+In this version, consider addition is only type of operation allowed
+to have a cage of >2 cells
 
            // sum[c.members.val]
 */
 }
 
-// run {
-
-// } for exactly 3 Member
+run {
+    // wellformed
+    Singleton
+} for exactly 9 Member, 1 Board
