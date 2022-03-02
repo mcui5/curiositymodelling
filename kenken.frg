@@ -98,9 +98,9 @@ pred Singleton {
 
         Board.position[i][j] = m
 
-        no k,l: Int | {
-            (k != i or l !=j implies Board.position[k][l] = m)
-        }
+        // no k,l: Int | {
+        //     (k != i or l != j implies Board.position[k][l] = m)
+        // }
       } 
     //   // No members exist outside the board bounds
     //   no i,j: Int | { // Currently unsat
